@@ -1,89 +1,80 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
+
+const sections = [
+  { title: "Top Airing", endpoint: "https://api.jikan.moe/v4/top/anime?filter=airing&limit=10" },
+  { title: "Most Popular", endpoint: "https://api.jikan.moe/v4/top/anime?limit=10" },
+  { title: "Upcoming", endpoint: "https://api.jikan.moe/v4/top/anime?filter=upcoming&limit=10" }
+];
 
 function App() {
-  const [animeList, setAnimeList] = useState([]);
-  const [search, setSearch] = useState("");
+  const [rows, setRows] = useState([]);
 
   useEffect(() => {
-    if (search.length < 2) {
-      setAnimeList([]);
-      return;
+    async function fetchData() {
+      const results = await Promise.all(
+        sections.map(async (section) => {
+          const res = await fetch(section.endpoint);
+          const data = await res.json();
+          return { title: section.title, anime: data.data || [] };
+        })
+      );
+      setRows(results);
     }
-    fetch(`https://api.jikan.moe/v4/anime?q=${encodeURIComponent(search)}&limit=20`)
-      .then(res => res.json())
-      .then(data => setAnimeList(data.data || []))
-      .catch(() => setAnimeList([]));
-  }, [search]);
+    fetchData();
+  }, []);
 
   return (
-    <div style={{ background: "#0f0f0f", minHeight: "100vh", color: "#fff", fontFamily: "Helvetica, Arial, sans-serif" }}>
+    <div style={{ backgroundColor: "#0f0f0f", color: "#fff", fontFamily: "Helvetica, Arial, sans-serif" }}>
       <header style={{
-        backgroundColor: "#1c1c1c",
+        backgroundColor: "#1a1a1a",
         padding: "1rem 2rem",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between"
+        fontSize: "2rem",
+        fontWeight: "bold",
+        color: "#f85f73"
       }}>
-        <h1 style={{ margin: 0, fontSize: "1.8rem", color: "#f85f73" }}>shenanimetv</h1>
-        <input
-          type="text"
-          placeholder="Search anime..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          style={{
-            padding: "0.5rem 1rem",
-            borderRadius: "20px",
-            border: "none",
-            outline: "none",
-            width: "220px",
-            backgroundColor: "#2a2a2a",
-            color: "#fff"
-          }}
-        />
+        shenanimetv
       </header>
 
       <main style={{ padding: "2rem" }}>
-        {animeList.length > 0 && (
-          <>
-            <h2 style={{ fontSize: "1.5rem", marginBottom: "1rem" }}>Search Results</h2>
+        {rows.map((row, i) => (
+          <div key={i} style={{ marginBottom: "2.5rem" }}>
+            <h2 style={{ marginBottom: "1rem", fontSize: "1.5rem", borderLeft: "4px solid #f85f73", paddingLeft: "0.5rem" }}>
+              {row.title}
+            </h2>
             <div style={{
               display: "flex",
               overflowX: "auto",
               gap: "1rem",
-              paddingBottom: "1rem"
+              paddingBottom: "0.5rem",
+              scrollbarWidth: "none"
             }}>
-              {animeList.map((anime) => (
+              {row.anime.map((anime) => (
                 <div
                   key={anime.mal_id}
                   onClick={() => window.open(anime.url, "_blank")}
                   style={{
                     minWidth: "160px",
-                    cursor: "pointer",
-                    backgroundColor: "#1e1e1e",
+                    backgroundColor: "#1c1c1c",
                     borderRadius: "10px",
                     overflow: "hidden",
-                    boxShadow: "0 4px 12px rgba(0,0,0,0.3)",
-                    transition: "transform 0.2s ease"
+                    cursor: "pointer",
+                    transition: "transform 0.2s ease-in-out"
                   }}
                 >
                   <img
                     src={anime.images.jpg.image_url}
                     alt={anime.title}
-                    style={{ width: "100%", height: "240px", objectFit: "cover" }}
+                    style={{ width: "100%", height: "230px", objectFit: "cover" }}
                   />
                   <div style={{ padding: "0.5rem" }}>
-                    <div style={{ fontSize: "14px", fontWeight: "bold", color: "#fefefe" }}>
-                      {anime.title}
-                    </div>
-                    <div style={{ fontSize: "12px", color: "#aaa" }}>
-                      {anime.year || "Unknown"} • {anime.status}
-                    </div>
+                    <div style={{ fontSize: "13px", fontWeight: "bold" }}>{anime.title}</div>
+                    <div style={{ fontSize: "11px", color: "#aaa" }}>{anime.status}</div>
                   </div>
                 </div>
               ))}
             </div>
-          </>
-        )}
+          </div>
+        ))}
       </main>
     </div>
   );

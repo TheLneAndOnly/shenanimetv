@@ -1,30 +1,30 @@
 import React, { useEffect, useState } from "react";
 
-const sections = [
-  { title: "Top Airing", endpoint: "https://api.jikan.moe/v4/top/anime?filter=airing&limit=10" },
-  { title: "Most Popular", endpoint: "https://api.jikan.moe/v4/top/anime?limit=10" },
-  { title: "Upcoming", endpoint: "https://api.jikan.moe/v4/top/anime?filter=upcoming&limit=10" }
+const genres = [
+  { title: "Action", id: 1 },
+  { title: "Romance", id: 22 },
+  { title: "Horror", id: 14 }
 ];
 
 function App() {
   const [rows, setRows] = useState([]);
 
   useEffect(() => {
-    async function fetchData() {
+    async function fetchGenres() {
       const results = await Promise.all(
-        sections.map(async (section) => {
-          const res = await fetch(section.endpoint);
+        genres.map(async (genre) => {
+          const res = await fetch(`https://api.jikan.moe/v4/anime?genres=${genre.id}&order_by=score&limit=10`);
           const data = await res.json();
-          return { title: section.title, anime: data.data || [] };
+          return { title: genre.title, anime: data.data || [] };
         })
       );
       setRows(results);
     }
-    fetchData();
+    fetchGenres();
   }, []);
 
   return (
-    <div style={{ backgroundColor: "#0f0f0f", color: "#fff", fontFamily: "Helvetica, Arial, sans-serif" }}>
+    <div style={{ backgroundColor: "#0f0f0f", minHeight: "100vh", color: "#fff", fontFamily: "Helvetica, Arial, sans-serif" }}>
       <header style={{
         backgroundColor: "#1a1a1a",
         padding: "1rem 2rem",
@@ -53,22 +53,41 @@ function App() {
                   key={anime.mal_id}
                   onClick={() => window.open(anime.url, "_blank")}
                   style={{
+                    position: "relative",
                     minWidth: "160px",
                     backgroundColor: "#1c1c1c",
                     borderRadius: "10px",
                     overflow: "hidden",
                     cursor: "pointer",
-                    transition: "transform 0.2s ease-in-out"
+                    transition: "transform 0.3s ease",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = "scale(1.05)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = "scale(1)";
                   }}
                 >
                   <img
                     src={anime.images.jpg.image_url}
                     alt={anime.title}
-                    style={{ width: "100%", height: "230px", objectFit: "cover" }}
+                    style={{ width: "100%", height: "240px", objectFit: "cover" }}
                   />
-                  <div style={{ padding: "0.5rem" }}>
-                    <div style={{ fontSize: "13px", fontWeight: "bold" }}>{anime.title}</div>
-                    <div style={{ fontSize: "11px", color: "#aaa" }}>{anime.status}</div>
+                  <div style={{
+                    position: "absolute",
+                    bottom: 0,
+                    width: "100%",
+                    background: "rgba(0,0,0,0.6)",
+                    padding: "6px",
+                    fontSize: "13px",
+                    fontWeight: "bold",
+                    textAlign: "center",
+                    color: "#fff",
+                    whiteSpace: "nowrap",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis"
+                  }}>
+                    {anime.title}
                   </div>
                 </div>
               ))}

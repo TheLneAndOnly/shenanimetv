@@ -16,57 +16,75 @@ function App() {
   }, [search]);
 
   return (
-    <div style={{ padding: "20px", maxWidth: "1200px", margin: "0 auto" }}>
-      <h1 style={{ fontSize: "2.5em", textAlign: "center", marginBottom: "1em" }}>shenanimetv</h1>
-      <div style={{ textAlign: "center", marginBottom: "2em" }}>
+    <div style={{ background: "#0f0f0f", minHeight: "100vh", color: "#fff", fontFamily: "Helvetica, Arial, sans-serif" }}>
+      <header style={{
+        backgroundColor: "#1c1c1c",
+        padding: "1rem 2rem",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between"
+      }}>
+        <h1 style={{ margin: 0, fontSize: "1.8rem", color: "#f85f73" }}>shenanimetv</h1>
         <input
           type="text"
           placeholder="Search anime..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           style={{
-            width: "80%",
-            maxWidth: "500px",
-            padding: "12px",
-            fontSize: "16px",
-            borderRadius: "8px",
-            border: "1px solid #888",
-            backgroundColor: "#1e1e1e",
+            padding: "0.5rem 1rem",
+            borderRadius: "20px",
+            border: "none",
+            outline: "none",
+            width: "220px",
+            backgroundColor: "#2a2a2a",
             color: "#fff"
           }}
         />
-      </div>
-      <div style={{
-        display: "grid",
-        gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))",
-        gap: "20px"
-      }}>
-        {animeList.map(anime => (
-          <div
-            key={anime.mal_id}
-            onClick={() => window.open(anime.url, "_blank")}
-            style={{
-              cursor: "pointer",
-              backgroundColor: "#1c1c1c",
-              borderRadius: "10px",
-              overflow: "hidden",
-              transition: "transform 0.2s"
-            }}
-          >
-            <img
-              src={anime.images.jpg.image_url}
-              alt={anime.title}
-              style={{ width: "100%", height: "220px", objectFit: "cover" }}
-            />
-            <div style={{ padding: "10px" }}>
-              <div style={{ fontWeight: "bold", fontSize: "14px" }}>{anime.title}</div>
-              <div style={{ fontSize: "12px", color: "#ccc" }}>
-                {anime.year || "Unknown"} • {anime.status}
-              </div>
+      </header>
+
+      <main style={{ padding: "2rem" }}>
+        {animeList.length > 0 && (
+          <>
+            <h2 style={{ fontSize: "1.5rem", marginBottom: "1rem" }}>Search Results</h2>
+            <div style={{
+              display: "flex",
+              overflowX: "auto",
+              gap: "1rem",
+              paddingBottom: "1rem"
+            }}>
+              {animeList.map((anime) => (
+                <div
+                  key={anime.mal_id}
+                  onClick={() => window.open(anime.url, "_blank")}
+                  style={{
+                    minWidth: "160px",
+                    cursor: "pointer",
+                    backgroundColor: "#1e1e1e",
+                    borderRadius: "10px",
+                    overflow: "hidden",
+                    boxShadow: "0 4px 12px rgba(0,0,0,0.3)",
+                    transition: "transform 0.2s ease"
+                  }}
+                >
+                  <img
+                    src={anime.images.jpg.image_url}
+                    alt={anime.title}
+                    style={{ width: "100%", height: "240px", objectFit: "cover" }}
+                  />
+                  <div style={{ padding: "0.5rem" }}>
+                    <div style={{ fontSize: "14px", fontWeight: "bold", color: "#fefefe" }}>
+                      {anime.title}
+                    </div>
+                    <div style={{ fontSize: "12px", color: "#aaa" }}>
+                      {anime.year || "Unknown"} • {anime.status}
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
-          </div>
-        ))}
-      </div>
+          </>
+        )}
+      </main>
     </div>
   );
 }
